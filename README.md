@@ -1,0 +1,100 @@
+# 🎧 Spotify Popularity Analyzer
+
+**Version: 0.5**
+
+This is a desktop Python application for analyzing the popularity of artists' releases on Spotify. It uses the Spotify API and allows you to:
+
+- Search for artists  
+- Browse their discographies
+- View the popularity of all and each release, as well as tracks (with graphs)  
+- Filter releases by keywords (e.g., `live`, `remastered`, `demo`)  
+- Export popular albums and tracks to a text file  
+- Manually exclude unwanted releases  
+- Log in using your own Spotify API keys  
+- Log out to remove saved credentials
+
+---
+
+## 🛠 How to Use
+
+1. Get your **Client ID** and **Client Secret** from [Spotify for Developers](https://developer.spotify.com/dashboard/applications)  
+2. On first launch, the app will ask for your credentials and save them to `.spotify_credentials`  
+3. Enter an artist name and click **Search**  
+4. Select the desired artist and explore their data  
+5. Use the **File → Export Popularity...** menu to export data  
+6. Open **Settings** to adjust filters and the number of albums/tracks to export
+
+---
+
+## 🖼 Interface
+
+- Left panel: artist matches and discography  
+- Right panel: popularity graphs (albums and tracks)  
+- Top bar: search field  
+- Menu bar: export, settings, raw data, exit, about
+
+---
+
+## 📦 Building Executables
+
+### 🪟 Windows:
+
+```bash
+pyinstaller --onefile --noconsole popularity.py --hidden-import=spotipy
+```
+
+
+### 🍏 macOS:
+
+1. Make sure `pyinstaller` is installed:
+
+```bash
+pip install pyinstaller
+```
+
+2. Build:
+
+```bash
+pyinstaller --onefile --windowed popularity.py --hidden-import=spotipy
+```
+
+3. Run the resulting file from `dist/popularity`:
+
+```bash
+./dist/popularity
+```
+
+> If blocked by macOS Gatekeeper, allow the app in **System Settings → Privacy & Security**.
+
+---
+
+### 🐧 Linux:
+
+```bash
+pyinstaller --onefile --windowed popularity.py --hidden-import=spotipy
+chmod +x ./dist/popularity
+./dist/popularity
+```
+
+> On Linux, the file `.spotify_credentials` is hidden automatically thanks to the leading `.`.
+
+---
+
+## 📁 Files
+
+- `popularity.py` — main GUI  
+- `auth_handler.py` — handles login and credentials storage  
+- `.spotify_credentials` — your saved API keys (hidden file)  
+- `README.md` — this file
+
+---
+
+## 🧙‍♂️ Author
+
+Alexey Voronin  
+Georgia Tech, 2025  
+📫 avoronin3@gatech.edu  
+
+---
+
+## 🤘 Built for metal research!
