@@ -1,3 +1,5 @@
 .idea
 .venv
 popularity_test.py
+.spotify_credentials
+.
