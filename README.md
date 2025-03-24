@@ -68,18 +68,6 @@ pyinstaller --onefile --windowed popularity.py --hidden-import=spotipy
 
 ---
 
-### 🐧 Linux:
-
-```bash
-pyinstaller --onefile --windowed popularity.py --hidden-import=spotipy
-chmod +x ./dist/popularity
-./dist/popularity
-```
-
-> On Linux, the file `.spotify_credentials` is hidden automatically thanks to the leading `.`.
-
----
-
 ## 📁 Files
 
 - `popularity.py` — main GUI  
@@ -97,4 +85,4 @@ Georgia Tech, 2025
 
 ---
 
-## 🤘 Built for metal research!
+## Designed with metalheads in mind 🤘

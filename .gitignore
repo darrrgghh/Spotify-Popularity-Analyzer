@@ -12,3 +12,4 @@ dist/
 *.html
 .spotify_credentials
 popularity_test.py
+idea/
