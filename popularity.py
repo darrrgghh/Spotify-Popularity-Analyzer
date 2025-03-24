@@ -31,7 +31,7 @@ class SpotifyAnalyzer(tk.Tk):
     # ------------------------------
     def __init__(self, client_id, client_secret):
         super().__init__()
-        self.title("Spotify Popularity Analyzer 0.5")
+        self.title("Spotify Popularity Analyzer")
         self.geometry("1200x800")
         self.minsize(800, 600)
         self.resizable(True, True)
@@ -137,7 +137,7 @@ class SpotifyAnalyzer(tk.Tk):
         ttk.OptionMenu(settings_win, self.track_export_var, self.track_export_var.get(), *track_options).grid(row=9,
                                                                                                               column=1,
                                                                                                               sticky="w")
-        tk.Label(settings_win, text="Sort by:", font=checkbox_font).grid(row=10, column=0, padx=10, sticky="w")
+        tk.Label(settings_win, text="Popularity order:", font=checkbox_font).grid(row=10, column=0, padx=10, sticky="w")
         self.sort_order_var = tk.StringVar(value=self.settings.get("sort_order", "Descending"))
         sort_options = ["Descending", "Ascending"]
         ttk.OptionMenu(settings_win, self.sort_order_var, self.sort_order_var.get(), *sort_options).grid(row=10,
