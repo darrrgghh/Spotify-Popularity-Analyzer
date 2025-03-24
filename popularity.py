@@ -107,7 +107,7 @@ class SpotifyAnalyzer(tk.Tk):
         # Секция: Фильтрация по ключевым словам
         tk.Label(settings_win, text="To Filter Out:", font=label_font, fg='black').grid(row=2, column=0, sticky="w",
                                                                                           padx=10, pady=(15, 0))
-        keywords_list = ["demo", "live", "remastered", "edition", "deluxe", "reissue", "remix", "edit", "feat"]
+        keywords_list = ["demo", "live", "remastered", "edition", "deluxe", "reissue", "remix", "edit", "feat", "instrumental"]
         self.filter_keywords = {
             key: tk.BooleanVar(value=(key in self.settings["filters"]))
             for key in keywords_list
