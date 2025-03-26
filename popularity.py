@@ -13,7 +13,6 @@ import datetime
 from auth_handler import load_credentials, prompt_for_credentials
 from auth_handler import save_credentials, delete_credentials
 
-
 creds = load_credentials()
 if not creds:
     prompt_for_credentials()
@@ -65,10 +64,10 @@ class SpotifyAnalyzer(tk.Tk):
         file_menu = tk.Menu(menubar, tearoff=False)
         menubar.add_cascade(label="File", menu=file_menu)
         file_menu.add_command(label="Export Popularity...", command=self.export_popularity)
-        file_menu.add_command(label="Settings", command=self.open_settings_window)
         file_menu.add_command(label="Raw Data", command=self.show_raw_data)
-        file_menu.add_command(label="Log Out", command=self.logout_spotify)
+        file_menu.add_command(label="Settings", command=self.open_settings_window)
         file_menu.add_separator()
+        file_menu.add_command(label="Log Out", command=self.logout_spotify)
         file_menu.add_command(label="Exit", command=self.destroy)
 
         help_menu = tk.Menu(menubar, tearoff=False)
@@ -85,18 +84,21 @@ class SpotifyAnalyzer(tk.Tk):
     def open_settings_window(self):
         settings_win = tk.Toplevel(self)
         settings_win.title("Settings")
-        settings_win.geometry("470x370")
+        settings_win.geometry("400x400")
         settings_win.resizable(False, False)
+        settings_win.focus_force()
+        settings_win.grab_set()
+        settings_win.transient(self)
 
         label_font = ("Arial", 11, "bold")
         checkbox_font = ("Arial", 10)
 
         # Секция: Типы релизов
-        tk.Label(settings_win, text="To Look For:", font=label_font, fg='black').grid(row=0, column=0, sticky="w", padx=10,
+        tk.Label(settings_win, text="To Look For:", font=label_font, fg='black').grid(row=0, column=1, sticky="w", padx=10,
                                                                                    pady=(10, 0))
         self.release_types = {
             key: tk.BooleanVar(value=(key in self.settings["types"]))
-            for key in ["album", "single", "compilation", "appears_on"]
+            for key in ["album", "single", "compilation"]
         }
         for i, (rtype, var) in enumerate(self.release_types.items()):
             tk.Checkbutton(settings_win, text=rtype.capitalize(), variable=var, font=checkbox_font).grid(row=1,
@@ -105,43 +107,59 @@ class SpotifyAnalyzer(tk.Tk):
                                                                                                          sticky="w")
 
         # Секция: Фильтрация по ключевым словам
-        tk.Label(settings_win, text="To Filter Out:", font=label_font, fg='black').grid(row=2, column=0, sticky="w",
-                                                                                          padx=10, pady=(15, 0))
-        keywords_list = ["demo", "live", "remastered", "edition", "deluxe", "reissue", "remix", "edit", "feat", "instrumental"]
+        tk.Label(settings_win, text="To Filter Out:", font=label_font, fg='black').grid(row=2, column=1, sticky="w",
+                                                                                        padx=10, pady=(15, 0))
+
+        keywords_list = ["demo", "live", "remastered", "edition", "deluxe", "reissue", "remix", "edit", "feat",
+                         "instrumental"]
         self.filter_keywords = {
             key: tk.BooleanVar(value=(key in self.settings["filters"]))
             for key in keywords_list
         }
+
+        # Select All checkbox
+        self.select_all_var = tk.BooleanVar()
+
+        def toggle_all_filters():
+            select_all = self.select_all_var.get()
+            for var in self.filter_keywords.values():
+                var.set(select_all)
+
+        tk.Checkbutton(
+            settings_win, text="Select All", variable=self.select_all_var,
+            font=("Arial", 9, "italic"), command=toggle_all_filters
+        ).grid(row=3, column=0, padx=10, sticky="w")
+
+        # Отображение всех фильтров
         for i, (keyword, var) in enumerate(self.filter_keywords.items()):
-            row = 3 + i // 3
+            row = 4 + i // 3
             col = i % 3
-            tk.Checkbutton(settings_win, text=keyword.capitalize(), variable=var, font=checkbox_font).grid(row=row,
-                                                                                                           column=col,
-                                                                                                           padx=10,
-                                                                                                           sticky="w")
+            tk.Checkbutton(settings_win, text=keyword.capitalize(), variable=var, font=checkbox_font).grid(
+                row=row, column=col, padx=10, sticky="w"
+            )
 
         # Кол-во альбомов и треков
-        tk.Label(settings_win, text="Export Settings", font=label_font, fg='black').grid(row=7, column=0, sticky="w",
+        tk.Label(settings_win, text="Export Settings", font=label_font, fg='black').grid(row=9, column=1, sticky="w",
                                                                                          padx=10, pady=(20, 0))
-        tk.Label(settings_win, text="Albums to export:", font=checkbox_font).grid(row=8, column=0, padx=10, sticky="w")
+        tk.Label(settings_win, text="Albums to export:", font=checkbox_font).grid(row=12, column=1, padx=10, sticky="w")
         self.album_export_var = tk.StringVar(value=self.settings.get("albums_to_export", "3"))
         album_options = ["1", "2", "3", "4", "5", "All"]
-        ttk.OptionMenu(settings_win, self.album_export_var, self.album_export_var.get(), *album_options).grid(row=8,
-                                                                                                              column=1,
+        ttk.OptionMenu(settings_win, self.album_export_var, self.album_export_var.get(), *album_options).grid(row=12,
+                                                                                                              column=2,
                                                                                                               sticky="w")
 
-        tk.Label(settings_win, text="Tracks per album:", font=checkbox_font).grid(row=9, column=0, padx=10,
+        tk.Label(settings_win, text="Tracks per album:", font=checkbox_font).grid(row=14, column=1, padx=10,
                                                                                   pady=(10, 0), sticky="w")
         self.track_export_var = tk.StringVar(value=self.settings.get("tracks_to_export", "3"))
         track_options = ["1", "2", "3", "4", "5", "All"]
-        ttk.OptionMenu(settings_win, self.track_export_var, self.track_export_var.get(), *track_options).grid(row=9,
-                                                                                                              column=1,
+        ttk.OptionMenu(settings_win, self.track_export_var, self.track_export_var.get(), *track_options).grid(row=14,
+                                                                                                              column=2,
                                                                                                               sticky="w")
-        tk.Label(settings_win, text="Popularity order:", font=checkbox_font).grid(row=10, column=0, padx=10, sticky="w")
+        tk.Label(settings_win, text="Popularity order:", font=checkbox_font).grid(row=16, column=1, padx=10, sticky="w")
         self.sort_order_var = tk.StringVar(value=self.settings.get("sort_order", "Descending"))
         sort_options = ["Descending", "Ascending"]
-        ttk.OptionMenu(settings_win, self.sort_order_var, self.sort_order_var.get(), *sort_options).grid(row=10,
-                                                                                                         column=1,
+        ttk.OptionMenu(settings_win, self.sort_order_var, self.sort_order_var.get(), *sort_options).grid(row=16,
+                                                                                                         column=2,
                                                                                                          sticky="w")
 
         # Кнопка сохранить
@@ -159,7 +177,7 @@ class SpotifyAnalyzer(tk.Tk):
 
         # Кнопки OK и Cancel в один ряд
         button_frame = ttk.Frame(settings_win)
-        button_frame.grid(row=11, column=0, columnspan=3, pady=20)
+        button_frame.grid(row=17, column=0, columnspan=3, pady=15)
 
         ttk.Button(button_frame, text="OK", command=save_and_close, width=10).pack(side=tk.LEFT, padx=10)
         ttk.Button(button_frame, text="Cancel", command=settings_win.destroy, width=10).pack(side=tk.LEFT, padx=10)
@@ -266,7 +284,9 @@ class SpotifyAnalyzer(tk.Tk):
             "  • Search and display artist discographies\n"
             "  • Filter releases by type and keywords\n"
             "  • Visualize popularity with graphs\n"
-            "  • Export structured data for research\n"
+            "  • Export structured data on artist's popularty metrics\n"
+            "  • Export raw data from Spotify API as .txt or .json\n"
+            "  • More features to be introduced soon!\n"
             "  • Designed with metalheads in mind 🤘\n\n"
             "Voroshka software, 2025\n"
             "Alexey Voronin\n"
@@ -282,6 +302,7 @@ class SpotifyAnalyzer(tk.Tk):
         dialog = tk.Toplevel(self)
         dialog.title("About")
         dialog.resizable(False, False)
+        dialog.focus_force()
         dialog.transient(self)
         dialog.grab_set()
 
@@ -493,62 +514,198 @@ class SpotifyAnalyzer(tk.Tk):
         self.track_canvas.draw()
 
     def show_raw_data(self):
+        import json
+
         raw_win = tk.Toplevel(self)
         raw_win.title("Raw Data")
         raw_win.geometry("800x600")
+
+        # Text area
         text_area = scrolledtext.ScrolledText(raw_win, wrap=tk.WORD)
         text_area.pack(fill=tk.BOTH, expand=True)
+
+        # Styles (only red for errors)
+        text_area.tag_config("error", foreground="red")
+
+        # Context menu (right-click)
+        def copy_selection():
+            try:
+                selection = text_area.get(tk.SEL_FIRST, tk.SEL_LAST)
+                raw_win.clipboard_clear()
+                raw_win.clipboard_append(selection)
+            except tk.TclError:
+                pass
+
+        context_menu = tk.Menu(raw_win, tearoff=0)
+        context_menu.add_command(label="Copy", command=copy_selection)
+        text_area.bind("<Button-3>", lambda event: context_menu.tk_popup(event.x_root, event.y_root))
+
+        # Bottom buttons
+        button_frame = ttk.Frame(raw_win)
+        button_frame.pack(pady=5)
 
         def ms_to_minsec(ms):
             minutes = ms // 60000
             seconds = (ms % 60000) // 1000
             return f"{minutes}:{seconds:02d}"
 
-        data = {
-            "albums": "No album data available.",
-            "tracks": "No track data available."
-        }
+        def insert(line, tag=None):
+            text_area.insert(tk.END, line + "\n", tag)
 
-        # Жанр исполнителя
+        def copy_all():
+            text = text_area.get("1.0", tk.END).strip()
+            raw_win.clipboard_clear()
+            raw_win.clipboard_append(text)
+            messagebox.showinfo("Copied", "Raw data copied to clipboard.")
+
+        def export_to_txt():
+            content = text_area.get("1.0", tk.END).strip()
+            file_path = filedialog.asksaveasfilename(
+                defaultextension=".txt",
+                filetypes=[("Text files", "*.txt"), ("All files", "*.*")],
+                title="Save Raw Data"
+            )
+            if file_path:
+                try:
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        f.write(content)
+                    messagebox.showinfo("Saved", f"Raw data exported to:\n{file_path}")
+                except Exception as e:
+                    messagebox.showerror("Error", f"Failed to save file:\n{e}")
+
+        def export_to_json():
+            json_data = {
+                "artist_info": {},
+                "albums": [],
+                "tracks": []
+            }
+
+            if self.artist_id:
+                try:
+                    artist = self.sp.artist(self.artist_id)
+                    json_data["artist_info"] = {
+                        "name": self.artist_name,
+                        "genres": artist.get("genres", []),
+                        "followers": artist.get("followers", {}).get("total", 0),
+                        "spotify_url": artist.get("external_urls", {}).get("spotify", "")
+                    }
+                except:
+                    pass
+
+            for alb_id, alb_name, alb_pop, alb_year in self.albums:
+                try:
+                    album = self.sp.album(alb_id)
+                    json_data["albums"].append({
+                        "id": alb_id,
+                        "name": alb_name,
+                        "popularity": alb_pop,
+                        "release_date": album.get("release_date", "N/A"),
+                        "spotify_url": album.get("external_urls", {}).get("spotify", "")
+                    })
+                except:
+                    continue
+
+            if self.current_album_tracks:
+                track_ids = [t["id"] for t in self.current_album_tracks]
+                try:
+                    features = self.sp.audio_features(track_ids)
+                except:
+                    features = [None] * len(track_ids)
+
+                for t, f in zip(self.current_album_tracks, features):
+                    track_json = {
+                        "id": t["id"],
+                        "name": t["name"],
+                        "popularity": t["popularity"],
+                        "duration_ms": t.get("duration_ms", None),
+                        "duration": ms_to_minsec(t["duration_ms"]) if t.get("duration_ms") else "N/A",
+                        "spotify_url": t.get("external_urls", {}).get("spotify", "N/A")
+                    }
+                    if f:
+                        track_json["tempo"] = f.get("tempo", "N/A")
+                        track_json["valence"] = f.get("valence", "N/A")
+                    json_data["tracks"].append(track_json)
+
+            file_path = filedialog.asksaveasfilename(
+                defaultextension=".json",
+                filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
+                title="Export as JSON"
+            )
+            if file_path:
+                try:
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        json.dump(json_data, f, indent=2)
+                    messagebox.showinfo("Saved", f"JSON exported to:\n{file_path}")
+                except Exception as e:
+                    messagebox.showerror("Error", f"Failed to export JSON:\n{e}")
+
+        ttk.Button(button_frame, text="Copy All", command=copy_all).pack(side=tk.LEFT, padx=10)
+        ttk.Button(button_frame, text="Export to .txt", command=export_to_txt).pack(side=tk.LEFT, padx=10)
+        ttk.Button(button_frame, text="Export as JSON", command=export_to_json).pack(side=tk.LEFT, padx=10)
+
+        # Populate text area
+        if not self.artist_id:
+            insert("Albums: No album data available.", "error")
+            insert("Tracks: No track data available.", "error")
+            return
+
         try:
             artist_info = self.sp.artist(self.artist_id)
-            genres = artist_info.get("genres", [])
-            genre_str = ", ".join(genres) if genres else "N/A"
-        except:
-            genre_str = "N/A"
+            insert("Artist Info:")
+            insert(f"  Name: {self.artist_name}")
+            insert(f"  Genres: {', '.join(artist_info.get('genres', []))}")
+            insert(f"  Followers: {artist_info['followers']['total']}")
+            insert(f"  Spotify URL: {artist_info['external_urls']['spotify']}")
+            insert("")
+        except Exception as e:
+            insert(f"Error loading artist info: {e}", "error")
+            insert("")
 
-        if self.albums:
-            data["albums"] = [
-                {
-                    "id": a_id,
-                    "name": a_name,
-                    "popularity": pop,
-                    "year": year,
-                    "genre": genre_str
-                }
-                for (a_id, a_name, pop, year) in self.albums
-            ]
+        if not self.albums:
+            insert("Albums: No album data available.", "error")
+            insert("Tracks: No track data available.", "error")
+            return
 
-        if self.current_album_tracks:
-            enriched_tracks = []
-            track_ids = [t["id"] for t in self.current_album_tracks]
+        insert("Albums:")
+        for alb_id, alb_name, alb_pop, alb_year in self.albums:
             try:
-                features_list = self.sp.audio_features(track_ids)
-            except Exception:
-                features_list = [None] * len(track_ids)
+                album_data = self.sp.album(alb_id)
+                insert(f"  • {alb_name} ({alb_year})")
+                insert(f"     ID: {alb_id}")
+                insert(f"     Popularity: {alb_pop}")
+                insert(f"     Release date: {album_data.get('release_date', 'N/A')}")
+                insert(f"     Spotify URL: {album_data['external_urls']['spotify']}")
+                insert("")
+            except Exception as e:
+                insert(f"  • {alb_name} — Error fetching album details: {e}", "error")
+                insert("")
 
-            for t, f in zip(self.current_album_tracks, features_list):
-                enriched_tracks.append({
-                    "id": t["id"],
-                    "name": t["name"],
-                    "popularity": t["popularity"],
-                    "duration": ms_to_minsec(f["duration_ms"]) if f else "N/A",
-                    "valence": f["valence"] if f else "N/A",
-                    "tempo": f["tempo"] if f else "N/A"
-                })
-            data["tracks"] = enriched_tracks
+        if not self.current_album_tracks:
+            insert("Tracks: No track data available.", "error")
+            return
 
-        text_area.insert(tk.END, json.dumps(data, indent=2))
+        insert("Tracks:")
+        track_ids = [t["id"] for t in self.current_album_tracks]
+        try:
+            features_list = self.sp.audio_features(track_ids)
+        except Exception as e:
+            features_list = [None] * len(track_ids)
+            insert(f"(Audio features not loaded: {e})", "error")
+            insert("")
+
+        for t, f in zip(self.current_album_tracks, features_list):
+            insert(f"  • {t['name']}")
+            insert(f"     ID: {t['id']}")
+            insert(f"     Popularity: {t['popularity']}")
+            dur = t.get("duration_ms", None)
+            insert(f"     Duration: {ms_to_minsec(dur)} ({dur} ms)" if dur else "     Duration: N/A")
+            insert(f"     Spotify URL: {t.get('external_urls', {}).get('spotify', 'N/A')}")
+            if f:
+                insert(f"     Tempo: {f.get('tempo', 'N/A')}")
+                insert(f"     Valence: {f.get('valence', 'N/A')}")
+            else:
+                insert("     No audio features available.", "error")
+            insert("")
 
     def export_popularity(self):
         if not self.artist_id or not self.albums:
@@ -562,24 +719,26 @@ class SpotifyAnalyzer(tk.Tk):
         sorted_albums = sorted(self.albums, key=lambda x: x[2], reverse=reverse_order)
         top_albums = sorted_albums[:export_num]
 
-        lines = []
         dt = datetime.datetime.now().astimezone()
-        lines.append(f"Popularity Export for Artist: {self.artist_name}")
-        lines.append(f"Date/Time (Local): {dt.strftime('%Y-%m-%d %H:%M:%S %Z')}")
-        lines.append("Source: Spotify API\n")
-
         all_keywords = self._get_expanded_keywords()
 
         try:
             artist_info = self.sp.artist(self.artist_id)
             genres = artist_info.get("genres", [])
-            genre_str = ", ".join(genres) if genres else "N/A"
+            genre_str = ", ".join(sorted(set(genres))) if genres else "N/A"
         except:
             genre_str = "N/A"
 
+        lines = []
+        lines.append(f"Popularity Export for Artist: {self.artist_name}")
+        lines.append(f"Date/Time (Local): {dt.strftime('%Y-%m-%d %H:%M:%S %Z')}")
+        lines.append(f"Genre: {genre_str}")
+        lines.append(f"The most popular song: ")
+        lines.append(f"Stream Count: ")
+        lines.append("Source: Spotify API — https://www.spotify.com\n")
+
         for (alb_id, alb_name, alb_pop, alb_year) in top_albums:
             lines.append(f"Album: {alb_name} ({alb_year}), Popularity: {alb_pop}")
-            lines.append(f"  Genre: {genre_str}")
             try:
                 album_tracks = self.sp.album_tracks(alb_id, limit=50)['items']
             except Exception as e:
@@ -605,7 +764,7 @@ class SpotifyAnalyzer(tk.Tk):
             top_tracks = track_data if track_limit == "All" else track_data[:int(track_limit)]
 
             for (t_name, t_pop) in top_tracks:
-                lines.append(f"   Track: {t_name}, Popularity: {t_pop}")
+                lines.append(f"   Track: {t_name}, Popularity: {t_pop}, Stream Count: ")
             lines.append("")
 
         output_text = "\n".join(lines)
