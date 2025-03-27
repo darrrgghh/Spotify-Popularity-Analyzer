@@ -150,24 +150,24 @@ class SpotifyAnalyzer(tk.Tk):
         # Кол-во альбомов и треков
         tk.Label(settings_win, text="Export Settings", font=label_font, fg='black').grid(row=9, column=1, sticky="w",
                                                                                          padx=10, pady=(20, 0))
-        tk.Label(settings_win, text="Albums to export:", font=checkbox_font).grid(row=12, column=1, padx=10, sticky="w")
+        tk.Label(settings_win, text="Albums to export:", font=checkbox_font).grid(row=12, column=0, padx=10, sticky="w")
         self.album_export_var = tk.StringVar(value=self.settings.get("albums_to_export", "3"))
         album_options = ["1", "2", "3", "4", "5", "All"]
         ttk.OptionMenu(settings_win, self.album_export_var, self.album_export_var.get(), *album_options).grid(row=12,
                                                                                                               column=2,
                                                                                                               sticky="w")
 
-        tk.Label(settings_win, text="Tracks per album:", font=checkbox_font).grid(row=14, column=1, padx=10,
+        tk.Label(settings_win, text="Tracks per album:", font=checkbox_font).grid(row=13, column=0, padx=10,
                                                                                   pady=(10, 0), sticky="w")
         self.track_export_var = tk.StringVar(value=self.settings.get("tracks_to_export", "3"))
         track_options = ["1", "2", "3", "4", "5", "All"]
-        ttk.OptionMenu(settings_win, self.track_export_var, self.track_export_var.get(), *track_options).grid(row=14,
+        ttk.OptionMenu(settings_win, self.track_export_var, self.track_export_var.get(), *track_options).grid(row=13,
                                                                                                               column=2,
                                                                                                               sticky="w")
-        tk.Label(settings_win, text="Popularity order:", font=checkbox_font).grid(row=16, column=1, padx=10, sticky="w")
+        tk.Label(settings_win, text="Popularity order:", font=checkbox_font).grid(row=14, column=0, padx=10, sticky="w")
         self.sort_order_var = tk.StringVar(value=self.settings.get("sort_order", "Descending"))
         sort_options = ["Descending", "Ascending"]
-        ttk.OptionMenu(settings_win, self.sort_order_var, self.sort_order_var.get(), *sort_options).grid(row=16,
+        ttk.OptionMenu(settings_win, self.sort_order_var, self.sort_order_var.get(), *sort_options).grid(row=14,
                                                                                                          column=2,
                                                                                                          sticky="w")
 
@@ -186,7 +186,7 @@ class SpotifyAnalyzer(tk.Tk):
 
         # Кнопки OK и Cancel в один ряд
         button_frame = ttk.Frame(settings_win)
-        button_frame.grid(row=17, column=0, columnspan=3, pady=15)
+        button_frame.grid(row=18, column=0, columnspan=3, pady=15)
 
         ttk.Button(button_frame, text="OK", command=save_and_close, width=10).pack(side=tk.LEFT, padx=10)
         ttk.Button(button_frame, text="Cancel", command=settings_win.destroy, width=10).pack(side=tk.LEFT, padx=10)
