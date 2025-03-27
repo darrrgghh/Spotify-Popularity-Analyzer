@@ -73,7 +73,6 @@ pyinstaller --onefile --windowed popularity.py --hidden-import=spotipy
 
 - `popularity.py` — main GUI  
 - `auth_handler.py` — handles login and credentials storage  
-- `.spotify_credentials` — your saved API keys (hidden file, or not so hidden actually)  
 - `.spotify_credentials` — your saved API keys (sort of hidden file)
 - `popularity.spec` — PyInstaller build specification
 - `splash.png` — splash screen image
