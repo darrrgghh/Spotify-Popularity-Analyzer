@@ -9,9 +9,12 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import json
 import sys
+import os
 import datetime
 from auth_handler import load_credentials, prompt_for_credentials
 from auth_handler import save_credentials, delete_credentials
+from PIL import ImageTk, Image
+import time
 
 creds = load_credentials()
 if not creds:
@@ -83,6 +86,12 @@ class SpotifyAnalyzer(tk.Tk):
 
     def open_settings_window(self):
         settings_win = tk.Toplevel(self)
+        if hasattr(sys, "_MEIPASS"):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.abspath(".")
+        icon_path = os.path.join(base_path, "ico.ico")
+        settings_win.iconbitmap(icon_path)
         settings_win.title("Settings")
         settings_win.geometry("400x400")
         settings_win.resizable(False, False)
@@ -181,6 +190,13 @@ class SpotifyAnalyzer(tk.Tk):
 
         ttk.Button(button_frame, text="OK", command=save_and_close, width=10).pack(side=tk.LEFT, padx=10)
         ttk.Button(button_frame, text="Cancel", command=settings_win.destroy, width=10).pack(side=tk.LEFT, padx=10)
+
+        # Центрирование окна Settings
+        settings_win.update_idletasks()
+        w, h = settings_win.winfo_reqwidth(), settings_win.winfo_reqheight()
+        x = (settings_win.winfo_screenwidth() // 2) - (w // 2)
+        y = (settings_win.winfo_screenheight() // 2) - (h // 2)
+        settings_win.geometry(f"{w}x{h}+{x}+{y}")
 
     def _create_main_layout(self):
         # Top frame for the search bar
@@ -300,6 +316,12 @@ class SpotifyAnalyzer(tk.Tk):
         )
 
         dialog = tk.Toplevel(self)
+        if hasattr(sys, "_MEIPASS"):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.abspath(".")
+        icon_path = os.path.join(base_path, "ico.ico")
+        dialog.iconbitmap(icon_path)
         dialog.title("About")
         dialog.resizable(False, False)
         dialog.focus_force()
@@ -514,11 +536,21 @@ class SpotifyAnalyzer(tk.Tk):
         self.track_canvas.draw()
 
     def show_raw_data(self):
-        import json
-
         raw_win = tk.Toplevel(self)
+        if hasattr(sys, "_MEIPASS"):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.abspath(".")
+        icon_path = os.path.join(base_path, "ico.ico")
+        raw_win.iconbitmap(icon_path)
         raw_win.title("Raw Data")
         raw_win.geometry("800x600")
+
+        # Центрирование только позиции — без изменения размера!
+        raw_win.update_idletasks()
+        x = (raw_win.winfo_screenwidth() // 2) - (800 // 2)
+        y = (raw_win.winfo_screenheight() // 2) - (600 // 2)
+        raw_win.geometry(f"+{x}+{y}")
 
         # Text area
         text_area = scrolledtext.ScrolledText(raw_win, wrap=tk.WORD)
@@ -784,6 +816,44 @@ class SpotifyAnalyzer(tk.Tk):
 
 
 def main():
+    # Поддержка путей внутри PyInstaller-сборки
+    if hasattr(sys, "_MEIPASS"):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+
+    icon_path = os.path.join(base_path, "ico.ico")
+    splash_path = os.path.join(base_path, "splash.png")
+    # Показ сплэш-экрана
+    splash = tk.Tk()
+    splash.overrideredirect(True)
+    splash.geometry("600x400+{}+{}".format(
+        (splash.winfo_screenwidth() - 600) // 2,
+        (splash.winfo_screenheight() - 400) // 2
+    ))
+
+    try:
+        splash_img = Image.open(splash_path)
+        w, h = splash_img.size
+
+        max_w, max_h = 800, 600  # максимальные размеры окна
+        scale = min(max_w / w, max_h / h)
+        new_size = (int(w * scale), int(h * scale))
+
+        splash_img = splash_img.resize(new_size, Image.LANCZOS)
+        splash_photo = ImageTk.PhotoImage(splash_img)
+
+        label = tk.Label(splash, image=splash_photo, bg="black")
+        label.image = splash_photo
+        label.pack(expand=True)
+        splash.geometry(
+            f"{new_size[0]}x{new_size[1]}+{(splash.winfo_screenwidth() - new_size[0]) // 2}+{(splash.winfo_screenheight() - new_size[1]) // 2}")
+    except Exception as e:
+        print("Could not load splash image:", e)
+
+    splash.after(2500, splash.destroy)
+    splash.mainloop()
+
     creds = load_credentials()
     if not creds:
         prompt_for_credentials()
@@ -795,8 +865,8 @@ def main():
     client_secret = creds["client_secret"]
 
     app = SpotifyAnalyzer(client_id, client_secret)
+    app.iconbitmap(icon_path)
     app.mainloop()
-
 
 if __name__ == "__main__":
     main()

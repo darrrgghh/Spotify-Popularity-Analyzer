@@ -1,7 +1,6 @@
 __pycache__/
 build/
 dist/
-*.spec
 *.pyc
 *.pyo
 *.pyd
