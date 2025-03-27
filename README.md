@@ -55,7 +55,7 @@ pip install pyinstaller
 2. Build using the provided popularity.spec file (recommended):
 
 ```bash
-pyinstaller --onefile --windowed popularity.py --hidden-import=spotipy
+pyinstaller popularity.spec
 ```
 Alternatively, you can build manually like this:
 
