@@ -39,20 +39,7 @@ This is a desktop Python application for analyzing the popularity of artists' re
 
 ### Windows:
 
-```bash
-pyinstaller --onefile --noconsole popularity.py --hidden-import=spotipy
-```
-
-
-### macOS:
-
-1. Make sure `pyinstaller` is installed:
-
-```bash
-pip install pyinstaller
-```
-
-2. Build using the provided popularity.spec file (recommended):
+Build using the provided popularity.spec file (recommended):
 
 ```bash
 pyinstaller popularity.spec
@@ -62,8 +49,14 @@ Alternatively, you can build manually like this:
 ```bash
 pyinstaller --onefile --windowed popularity.py --hidden-import=spotipy
 ```
+### macOS:
 
-3. Run the resulting file from `dist/`:
+Make sure `pyinstaller` is installed:
+
+```bash
+pip install pyinstaller
+```
+Run the resulting file from `dist/`:
 
 > If blocked by macOS Gatekeeper, allow the app in **System Settings → Privacy & Security**.
 
@@ -78,8 +71,6 @@ pyinstaller --onefile --windowed popularity.py --hidden-import=spotipy
 - `splash.png` — splash screen image
 - `ico.ico` — app icon (required for builds). Currently, for Windows only.
 - `README.md` — you're reading me
-
-
 ---
 
 ## Author
@@ -90,4 +81,4 @@ avoronin3@gatech.edu
 
 ---
 
-## Designed with metalheads in mind 🤘
+##  🤘
