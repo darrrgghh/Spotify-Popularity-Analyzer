@@ -36,9 +36,6 @@ This is a desktop Python application for analyzing the popularity of artists' re
 ---
 
 ## Building Executables
-
-### Windows:
-
 Build using the provided popularity.spec file (recommended):
 
 ```bash
@@ -49,16 +46,6 @@ Alternatively, you can build manually like this:
 ```bash
 pyinstaller --onefile --windowed popularity.py --hidden-import=spotipy
 ```
-### macOS:
-
-Make sure `pyinstaller` is installed:
-
-```bash
-pip install pyinstaller
-```
-Run the resulting file from `dist/`:
-
-> If blocked by macOS Gatekeeper, allow the app in **System Settings → Privacy & Security**.
 
 ---
 
